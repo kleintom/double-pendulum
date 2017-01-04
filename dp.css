@@ -1,0 +1,138 @@
+body {
+    background: #f9f9f9;
+    width: 712px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#noSupport {
+    border: 4px solid red;
+    padding: 8px;
+    display: none;
+}
+#noSupport #noWorkerSupport, #noSVGSupport {
+    display: none;
+}
+
+#title {
+    font-size: 2.5em;
+}
+
+#controls {
+    position: relative;
+}
+
+#controlsTitle {
+    padding: 6px 6px 1px 6px;
+    border: 1px solid #c3c3c3;
+    border-bottom: none;
+    margin: 16px 0px -1px 0px;
+    display: inline-block;
+    background: white;
+}
+
+#confInput {
+    margin: 0px 0px 16px 0px;
+    padding: 1.5em 0em 1.5em 1.5em;
+    border: 1px solid #c3c3c3;
+    background: white;
+}
+
+#confInput label {
+    width: 140px;
+    display: inline-block;
+    margin-bottom: 12px;
+    position: relative;
+}
+
+#confInput input[type="text"] {
+    width: 5em;
+    position: absolute;
+    left: 1.75em;
+    background: #fafafa;
+}
+
+#runControls {
+    background: white;
+    border: 6px solid black;
+    border-bottom: none;
+    margin-bottom: -12px;
+    display: inline-block;
+    padding: 3px;
+}
+
+#runControls input[type="button"] {
+    width: 7em;
+    margin: 0px 12px 0px 0px;
+}
+
+#controlsHelp {
+    padding: 12px;
+    min-height: 220px;
+    border: 1px solid #c3c3c3;
+    position: absolute;
+    left: 130px;
+    right: 8px;
+    /* top is computed by javascript since we don't know heights before
+       rendering */
+    background-color: rgba(255,255,255,.95);
+    visibility: hidden;
+}
+
+#controlsHelp p {
+    margin: 0 4px 0 0;
+}
+
+#controlsHelp svg {
+    float: right;
+}
+
+#configHelpButtonSVG {
+    position: absolute;
+    cursor: pointer;
+    bottom: 8px;
+    right: 8px;
+}
+
+#pendula {
+    border: 6px solid black;
+}
+
+#getSVG {
+    margin: 16px 0px;
+}
+
+#getSVG input {
+    border: 2px solid black;
+    margin-bottom: -2px;
+}
+
+#getSVG textarea {
+    width: 708px;
+}
+
+#getSVGHeader {
+    position: relative;
+}
+
+#getSVGHelpButtonSVG {
+    position: absolute;
+    cursor: pointer;
+    bottom: 0px;
+    right: 8px;
+}
+
+#getSVGHelpText {
+    position: absolute;
+    left: 130px;
+    right: 8px;
+    border: 1px solid #c3c3c3;
+    /* top is computed by javascript since we don't know heights before
+       rendering */
+    visibility: hidden;
+    background: white;
+}
+
+#getSVGHelpText p {
+    margin: 8px;
+}

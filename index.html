@@ -1,0 +1,151 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head>
+  <title>Double Pendulum Simulation</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <link rel="stylesheet" type="text/css" href="dp.css">
+  <script type="text/javascript" src="dp.js"></script>
+</head>
+
+<body>
+<div id="noSupport">
+  <p id="noWorkerSupport">
+    OoPs!  Your browser doesn't appear to
+    support <a href="https://en.wikipedia.org/wiki/Web_Workers">Web
+    Workers</a>, so this page won't work.
+    See <a href="http://caniuse.com/webworkers">http://caniuse.com/webworkers</a>
+    for a list of browsers that do support Web Workers.
+  </p>
+  <p id="noSVGSupport">
+    OoPs!  Your browser doesn't appear to
+    support <a href="https://en.wikipedia.org/wiki/Scalable_Vector_Graphics">SVG</a>,
+    so this page won't work.
+    See <a href="http://caniuse.com/svg-html5">http://caniuse.com/svg-html5</a>
+    for a list of browsers that do support SVG.
+  </p>
+</div>
+
+<div id="title"><a href="https://en.wikipedia.org/wiki/Double_pendulum">Double Pendulum</a></div>
+<div id="controls">
+  <div id="controlsTitle">Initial Conditions</div>
+  <div id="confInput">
+    <form id="controlsForm">
+    <label>L<sub>1</sub> <input id="l1" value="40" type="text"></label>
+    <label>L<sub>2</sub> <input id="l2" value="200" type="text"></label>
+    <label>M<sub>1</sub> <input id="m1" value="1" type="text"></label>
+    <label>M<sub>2</sub> <input id="m2" value="1" type="text"></label><br>
+    <label>θ<sub>1</sub> <input id="t1" value="179" type="text"></label>
+    <label>θ<sub>2</sub> <input id="t2" value="179" type="text"></label>
+    <label>ω<sub>1</sub> <input id="o1" value="0" type="text"></label>
+    <label>ω<sub>2</sub> <input id="o2" value="0" type="text"></label><br>
+    <input id="reload" value="Load new values" type="button">
+    </form>
+  </div>
+  <svg version="1.1" baseProfile="full" xmlns="http://www.w3.org/2000/svg" width="30px" height="30px" id="configHelpButtonSVG">
+    <g id="controlsHelpButton">
+      <rect rx="2" ry="2" width="30" height="30" stroke="#888" fill="#eee"></rect>
+      <text fill="#999" stroke="#666" font-size="28" x="8" y="26">?</text>
+    </g>
+  </svg>
+  <div id="controlsHelp" style="top: 177px;">
+    <svg version="1.1" baseProfile="full" xmlns="http://www.w3.org/2000/svg" width="230px" height="220px">
+      <!--<rect width="300" height="300" fill="red" />-->
+      <g transform="translate(5,5)">
+        <!--L_1 vertical-->
+        <line y2="50" stroke="black" stroke-width="2" stroke-dasharray="10,5"></line>
+        <!--L_2 vertical-->
+        <line x1="200" y1="80" x2="200" y2="130" stroke="black" stroke-width="2" stroke-dasharray="10,5"></line>
+        <!--theta_1 arc-->
+        <path d="M 0 40 A 40 40 0 0 0 37.14 14.86" fill="none" stroke="black" stroke-width="2"></path>
+        <!--theta_2 arc-->
+        <path d="M 164.78 98.96 A 40 40 0 0 0 200 120" fill="none" stroke="black" stroke-width="2"></path>
+        <circle r="5"></circle>
+        <!--omega_1 arrow-->
+        <!--http://stackoverflow.com/questions/12680166/how-to-use-an-arrow-marker-on-an-svg-line-element-->
+        <defs>
+          <marker id="triangle" viewBox="0 0 10 10" refX="0" refY="5" markerUnits="strokeWidth" markerWidth="8" markerHeight="6" orient="auto">
+            <path d="M 0 0 L 10 5 L 0 10 z"></path>
+          </marker>
+        </defs>
+        <line x1="200" y1="80" x2="220" y2="30" marker-end="url(#triangle)" stroke="black" stroke-width="2"></line>
+        <!--omega_1 label-->
+        <text x="190" y="40" font-size="15">ω<tspan dy="5">1</tspan></text>
+        <!--omega_2 arrow-->
+        <line x1="70" y1="150" x2="100" y2="205.71" marker-end="url(#triangle)" stroke="black" stroke-width="2"></line>
+        <!--omega_2 label-->
+        <text x="92" y="183" font-size="15">ω<tspan dy="5">2</tspan></text>
+        <!--L_1-->
+        <line stroke-width="5" stroke="#3E4BAE" x2="200" y2="80"></line>
+        <!--L_2-->
+        <line stroke-width="5" stroke="#43AE3E" x1="200" y1="80" x2="70" y2="150"></line>
+        <!--M_1 circle-->
+        <circle r="20" cx="200" cy="80" stroke="#3E4BAE" fill="#3E4BAE"></circle>
+        <!--M_1 label-->
+        <text x="188" y="82" font-size="15" stroke="#ff0" fill="#ff0">M<tspan dy="5">1</tspan></text>
+        <!--M_2 circle-->
+        <circle r="18" cx="70" cy="150" stroke="#43AE3E" fill="#43AE3E"></circle>
+        <!--M_2 label-->
+        <text x="58" y="152" font-size="15" stroke="black" fill="#555">M<tspan dy="5">2</tspan></text>
+        <!--theta_1 label-->
+        <text x="20" y="50" font-size="15">θ<tspan dy="5">1</tspan></text>
+        <!--theta_2 label-->
+        <text x="170" y="130" font-size="15">θ<tspan dy="5">2</tspan></text>
+        <!--L_1 label-->
+        <text x="100" y="30" font-size="15">L<tspan dy="5">1</tspan></text>
+        <!--L_2 label-->
+        <text x="115" y="100" font-size="15">L<tspan dy="5">2</tspan></text>
+      </g>
+    </svg>
+    <p>These settings define where the pendula begin the simulation.
+      L's are the lengths of the pendula, M's their masses, θ's
+      the angle from a downward vertical (measured in degrees,
+      positive in the counter-clockwise direction, negative in the
+      clockwise direction), and ω's are angular
+      velocities (how fast each pendulum is spinning; a non-zero value
+      would correspond to giving the pendulum a push when the
+      simulation starts).
+    </p>
+  </div><!-- end #controlsHelp -->
+</div>
+
+<div id="runControls">
+  <input id="startPause" value="Start" type="button">
+  <label>Show trail: <input id="trailCheckbox" type="checkbox"></label>
+</div>
+
+
+<!-- svg doesn't have the equivalent of innerHTML, so wrap the svg in
+  a div that does -->
+<div id="pendula">
+<svg version="1.1" baseProfile="full" xmlns="http://www.w3.org/2000/svg" width="700px" height="700px">
+  <rect width="700" height="700" fill="white"></rect>
+  <g transform="translate(350,350) scale(1 -1)">
+    <polyline id="trail" stroke="black" fill="none" stroke-width="1" points=""></polyline>
+    <circle r="10"></circle>
+    <line id="line1" stroke-width="10" stroke="#3E4BAE" y2="39.99" x2="0.7"></line>
+    <line id="line2" stroke-width="10" stroke="#43AE3E" y2="239.96" x2="4.19" y1="39.99" x1="0.7"></line>
+  </g>
+</svg>
+</div>
+
+<form id="getSVG">
+  <div id="getSVGHeader">
+    <input id="genSVG" value="Generate SVG of current image" type="button">
+    <svg version="1.1" baseProfile="full" xmlns="http://www.w3.org/2000/svg" width="30px" height="30px" id="getSVGHelpButtonSVG">
+      <g id="getSVGHelpButton">
+        <rect rx="2" ry="2" width="30" height="30" stroke="#888" fill="#eee"></rect>
+        <text fill="#999" stroke="#666" font-size="28" x="8" y="26">?</text>
+      </g>
+    </svg>
+    <div id="getSVGHelpText" style="top: 20px;">
+      <p><em>If you're not familiar with SVG you can safely ignore
+      this.</em>
+      </p>
+      <p>Click the button to generate an SVG snapshot of the
+      image currently being shown in the simulator.
+      </p>
+    </div>      
+  </div>
+  <textarea id="svgText" rows="10"></textarea>
+</form>
+
+</body></html>
