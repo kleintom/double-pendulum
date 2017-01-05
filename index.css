@@ -1,8 +1,13 @@
+@media (min-width: 740px) {
+    body {
+        width: 712px;
+        margin: 0 auto;
+    }
+}
+
 body {
     background: #f9f9f9;
-    width: 712px;
-    margin-left: auto;
-    margin-right: auto;
+    padding: 12px;
 }
 
 #noSupport {
@@ -10,32 +15,34 @@ body {
     padding: 8px;
     display: none;
 }
-#noSupport #noWorkerSupport, #noSVGSupport {
+#noSupport #noWorkerSupport, #noSupport #noSVGSupport {
     display: none;
 }
 
 #title {
     font-size: 2.5em;
+    margin-bottom: 16px;
 }
 
 #controls {
     position: relative;
+    margin-bottom: 16px;
 }
 
 #controlsTitle {
-    padding: 6px 6px 1px 6px;
+    padding: 6px;
+    padding-bottom: 1px;
     border: 1px solid #c3c3c3;
     border-bottom: none;
-    margin: 16px 0px -1px 0px;
     display: inline-block;
     background: white;
 }
 
 #confInput {
-    margin: 0px 0px 16px 0px;
     padding: 1.5em 0em 1.5em 1.5em;
     border: 1px solid #c3c3c3;
     background: white;
+    display: inline-block;
 }
 
 #confInput label {
@@ -48,17 +55,25 @@ body {
 #confInput input[type="text"] {
     width: 5em;
     position: absolute;
-    left: 1.75em;
+    left: 2em;
     background: #fafafa;
+}
+
+form.conditionsInput {
+    float: left;
+}
+
+form#conditionsSubmit {
+    clear: both;
+    float: left;
 }
 
 #runControls {
     background: white;
     border: 6px solid black;
     border-bottom: none;
-    margin-bottom: -12px;
     display: inline-block;
-    padding: 3px;
+    padding: 6px;
 }
 
 #runControls input[type="button"] {
@@ -71,12 +86,13 @@ body {
     min-height: 220px;
     border: 1px solid #c3c3c3;
     position: absolute;
-    left: 130px;
+    left: 8px;
     right: 8px;
     /* top is computed by javascript since we don't know heights before
        rendering */
     background-color: rgba(255,255,255,.95);
     visibility: hidden;
+    z-index: 5;
 }
 
 #controlsHelp p {
@@ -90,16 +106,27 @@ body {
 #configHelpButtonSVG {
     position: absolute;
     cursor: pointer;
-    bottom: 8px;
+    bottom: 10px;
     right: 8px;
 }
 
 #pendula {
     border: 6px solid black;
+    position: relative;
+    padding-top: 100%;
+}
+
+#test {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
 }
 
 #getSVG {
     margin: 16px 0px;
+    width: 100%;
 }
 
 #getSVG input {
@@ -108,7 +135,8 @@ body {
 }
 
 #getSVG textarea {
-    width: 708px;
+    box-sizing: border-box;
+    width: 100%;
 }
 
 #getSVGHeader {
@@ -124,11 +152,11 @@ body {
 
 #getSVGHelpText {
     position: absolute;
-    left: 130px;
+    left: 8px;
     right: 8px;
     border: 1px solid #c3c3c3;
     /* top is computed by javascript since we don't know heights before
-       rendering */
+       rendering. */
     visibility: hidden;
     background: white;
 }

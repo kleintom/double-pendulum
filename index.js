@@ -1,22 +1,21 @@
 "use strict";
 var dp = {};
 
-// the web worker that actually generates our data (see dpWorker.js)
+// The web worker that actually generates our data (see dpWorker.js).
 dp.worker = null;
-// one call to draw() produces one frame of output; we create draw()
+// One call to draw() produces one frame of output; we create draw()
 // (with initializeDrawer()) each time the control parameters change
 // so that the parameters are "baked in".
 dp.draw = function() {};
-// dp.draw is called through a timer - remember which one
+// dp.draw is called through a timer - remember which one.
 dp.drawTimerID = 0;
-// the number of data points we (typically) ask for on each call to
-// the worker
+// The number of data points we (typically) ask for on each call to
+// the worker.
 dp.dataFetchSize = 520;
 
-// store and serve data for the simulation
+// Store and serve data for the simulation.
 dp.dataStore = (function() {
 
-  //////// private
   // Two element array: current data set (index specified by
   // |curDataIndex|) and next data set (the other index).
   // Each |data| item is stored as a string in the form
@@ -25,19 +24,19 @@ dp.dataStore = (function() {
   // the next data request) in the form
   // theta_1,theta_2,omega_1,omega_2
   var data = [{data: "", lastPoint: ""}, {data: "", lastPoint: ""}];
-  // specifies which index of data is currently in use
+  // Specifies which index of data is currently in use (0 or 1).
   var curDataIndex = 0;
   var nextDataIndex = function() {
     return (curDataIndex + 1) % 2;
   };
-  //////// public
+
   return {
     addData : function(newData, lastDataPoint) {
-    // always put new data at the inactive (non-drawing) data index
-    var newIndex = nextDataIndex();
-    data[newIndex].data = newData;
-    data[newIndex].lastPoint = lastDataPoint;
-    this.onDataLoaded();
+      // Always put new data at the inactive (non-drawing) data index.
+      var newIndex = nextDataIndex();
+      data[newIndex].data = newData;
+      data[newIndex].lastPoint = lastDataPoint;
+      this.onDataLoaded();
     },
     getNextData : function() {
       curDataIndex = nextDataIndex();
@@ -46,7 +45,7 @@ dp.dataStore = (function() {
     getCurLastPoint : function() {
       return data[curDataIndex].lastPoint;
     },
-    // function called when new data is loaded - set/reset it as needed
+    // Function called when new data is loaded - set/reset it as needed.
     onDataLoaded : function() {}
   };
 }());
@@ -54,16 +53,15 @@ dp.dataStore = (function() {
 //////////////////////////////////////////////////////////////////////
 
 // Creates a dp.draw function given the lengths l1 and l2 of the two
-// arms of the pendulum
+// arms of the pendulum.
 dp.initializeDrawer = function(l1, l2) {
-
-  // the actual list of coordinates to be drawn gets filled in
-  // the first time draw() is called (see the else leg below)
+  // The actual list of coordinates to be drawn gets filled in
+  // the first time draw() is called (see the else leg below).
   var coords = [];
   var dataLength = coords.length;
   var dataLengthOver2 = parseInt(dataLength / 2, 10);
   var i = 0;
-  // drawer constants
+  // Drawer constants.
   var line1 = document.getElementById('line1');
   var line2 = document.getElementById('line2');
   var trail = document.getElementById('trail');
@@ -73,7 +71,7 @@ dp.initializeDrawer = function(l1, l2) {
   dp.draw = function() {
 
     if (i < dataLength) {
-      //// (on long runs there is an appreciable difference between using
+      //// (On long runs there is an appreciable difference between using
       //// split and using indexOf/substring, at least on ff...)
       //var angles = coords[i].split(',');
       //var theta1 = angles[0];
@@ -82,10 +80,10 @@ dp.initializeDrawer = function(l1, l2) {
       var comma = theseCoords.indexOf(',');
       var theta1 = theseCoords.substring(0, comma);
       var theta2 = theseCoords.substring(comma + 1);
-      // coordinates of the first pendulum
+      // Coordinates of the first pendulum.
       var x1 = l1 * sin(theta1);
       var y1 = -l1 * cos(theta1);
-      // coordinates of the second pendulum
+      // Coordinates of the second pendulum.
       var x2 = x1 + l2 * sin(theta2);
       var y2 = y1 - l2 * cos(theta2);
       x1 = Math.round(x1 * 100) / 100;
@@ -95,20 +93,20 @@ dp.initializeDrawer = function(l1, l2) {
       if (dp.trailOn) {
         var trailData = trail.getAttributeNS(null, "points");
         if (trailData.length > 1800) {
-          // remove the first point from the trail
+          // Remove the first point from the trail.
           var firstSpace = trailData.indexOf(' ');
           trailData = trailData.substring(firstSpace + 1);
         }
         var separator = " ";
         if (!trailData) {
           // IE10 has undefined behavior if there's a space at the end
-          // of the list, so yeah, avoid that
+          // of the list, so yeah, avoid that.
           // TODO: arrange things so that we can get rid of this check
           // (need to know the point being drawn when the trail is turned
-          // on)
+          // on).
           separator = "";
         }
-        // append the new point to the trail
+        // Append the new point to the trail.
         trailData = trailData + separator + x2 + "," + y2;
         trail.setAttributeNS(null, "points", trailData);
       }
@@ -118,22 +116,12 @@ dp.initializeDrawer = function(l1, l2) {
       line2.setAttributeNS(null, 'x2', x2);
       line2.setAttributeNS(null, 'y1', y1);
       line2.setAttributeNS(null, 'x1', x1);
-      if (dp.whichCat) {
-        var cat = document.getElementById(dp.whichCat);
-        cat.setAttributeNS(null, 'x', x2);
-        cat.setAttributeNS(null, 'y', y2);
-        var theta2Deg = theta2 * 180 / PI;
-        var rotate = "rotate(" + theta2Deg + " " + x2 + " " + y2 + ")";
-        cat.setAttributeNS(null, 'transform',
-                           rotate + " translate(-52,-47)");
-      }
       i = i + 1;
-      if (i === dataLengthOver2) { // fetch the next data set
+      if (i === dataLengthOver2) { // Fetch the next data set.
         var lastPoint = dp.dataStore.getCurLastPoint();
         dp.worker.postMessage("s" + dp.dataFetchSize + "!" + lastPoint);
       }
-    }
-    else { // ran out of data - load us up
+    } else { // Ran out of data - load us up.
       coords = dp.dataStore.getNextData().split('|');
       dataLength = coords.length;
       dataLengthOver2 = parseInt(dataLength / 2, 10);
@@ -142,29 +130,27 @@ dp.initializeDrawer = function(l1, l2) {
   };
 };
 
-// Very sad, but we better use degrees on the user side
+// We better use degrees on the user side.
 dp.fetchAngle = function(id) {
   var value = document.getElementById(id).value;
-  return value * Math.PI / 180; // return radians
+  return value * Math.PI / 180; // Return radians.
 };
-// note special behavior for fetching angles
+// Note special behavior for fetching angles.
 dp.fetchValue = function(id) {
   if (id === "t1" || id === "t2" || id === "o1" || id === "o2") {
     return dp.fetchAngle(id);
-  }
-  else {
+  } else {
     return document.getElementById(id).value;
   }
 };
 dp.setAngle = function(id, radValue) {
-  var degValue = radValue * 180 / Math.PI; // set to degrees
+  var degValue = radValue * 180 / Math.PI; // Set to degrees.
   document.getElementById(id).value = degValue;
 };
 dp.setValue = function(id, value) {
   if (id === "t1" || id === "t2" || id === "o1" || id === "o2") {
     dp.setAngle(id, value);
-  }
-  else {
+  } else {
     document.getElementById(id).value = value;
   }
 };
@@ -181,17 +167,17 @@ dp.getParameters = function() {
   return [f('l1'), f('l2'), f('m1'), f('m2')];
 };
 
-// event handler for user clicking the Start/Pause button
+// Event handler for user clicking the Start/Pause button.
 dp.startPause = function() {
 
   var startPause = document.getElementById('startPause');
   var curValue = startPause.value;
   var newValue = "OOPS";
-  if (curValue === "Start") { // first start with cur control form values
+  if (curValue === "Start") { // First start with cur control form values.
     newValue = "Pause";
-    // disable the button while we fetch the initial dataset
+    // Disable the button while we fetch the initial dataset.
     startPause.disabled = true;
-    // what to do when the first dataset arrives
+    // What to do when the first dataset arrives.
     dp.dataStore.onDataLoaded = (function() {
       return function() {
         dp.drawTimerID = setInterval(dp.draw, 25);
@@ -199,16 +185,14 @@ dp.startPause = function() {
         dp.dataStore.onDataLoaded = (function() { return function() {};}());
       };
     }());
-    // on the first request, only fetch half the normal number of datapoints
+    // On the first request, only fetch half the normal number of datapoints.
     var fetchSize = parseInt(dp.dataFetchSize / 2, 10);
     dp.worker.postMessage("s" + fetchSize + "!" +
                           dp.getInitialConditions().join('|'));
-  }
-  else if (curValue === "Continue") {
+  } else if (curValue === "Continue") {
     newValue = "Pause";
-    dp.drawTimerID = setInterval(dp.draw, 25); // restart drawing
-  }
-  else { // Pause
+    dp.drawTimerID = setInterval(dp.draw, 25); // Restart drawing.
+  } else { // Pause.
     newValue = "Continue";
     if (dp.drawTimerID) {
       clearInterval(dp.drawTimerID);
@@ -220,7 +204,7 @@ dp.startPause = function() {
 dp.initializeControlValues = function() {
 
   var set = dp.setValue;
-  // check if previous settings have been saved in localStorage
+  // Check if previous settings have been saved in localStorage.
   if (localStorage && localStorage.getItem("l1")) {
     set('l1', localStorage.getItem("l1"));
     set('l2', localStorage.getItem("l2"));
@@ -230,8 +214,7 @@ dp.initializeControlValues = function() {
     set('t2', localStorage.getItem("t2"));
     set('o1', localStorage.getItem("o1"));
     set('o2', localStorage.getItem("o2"));
-  }
-  else { // use defaults defined here
+  } else { // Use defaults defined here.
     set('l1', '240');
     set('l2', '100');
     set('m1', '1');
@@ -267,7 +250,7 @@ dp.initializeWorkerAndDrawer = function() {
 
 dp.loadNewDrawer = function() {
 
-  // start by making sure the old drawer is stopped
+  // Start by making sure the old drawer is stopped.
   if (dp.drawTimerID) {
     clearInterval(dp.drawTimerID);
   }
@@ -280,8 +263,7 @@ dp.loadNewDrawer = function() {
     dp.storeConfigValues();
     startPause.disabled = false;
     startPause.value = "Start";
-  }
-  else {
+  } else {
     startPause.value = "Continue";
   }
 };
@@ -331,10 +313,10 @@ dp.drawInitialPendulum = function() {
   var params = dp.getParameters();
   var l1 = params[0];
   var l2 = params[1];
-  // coordinates of the end of the first pendulum
+  // Coordinates of the end of the first pendulum.
   var x1 = l1 * Math.sin(theta1);
   var y1 = -l1 * Math.cos(theta1);
-  // coordinates of the end of the second pendulum
+  // Coordinates of the end of the second pendulum.
   var x2 = x1 + l2 * Math.sin(theta2);
   var y2 = y1 - l2 * Math.cos(theta2);
   x1 = Math.round(x1*100)/100;
@@ -351,15 +333,6 @@ dp.drawInitialPendulum = function() {
   line2.setAttributeNS(null, 'x1', x1);
   var trail = document.getElementById('trail');
   trail.setAttributeNS(null, 'points', "");
-  if (dp.whichCat) {
-    var cat = document.getElementById(dp.whichCat);
-    cat.setAttributeNS(null, 'x', x2);
-    cat.setAttributeNS(null, 'y', y2);
-    var theta2Deg = theta2 * 180/Math.PI;
-    var rotate = "rotate(" + theta2Deg + " " + x2 + " " + y2 + ")";
-    cat.setAttributeNS(null, 'transform',
-                       rotate + " translate(-52,-47)");
-  }
 };
 
 dp.setTrail = function() {
@@ -367,25 +340,24 @@ dp.setTrail = function() {
   var checked = document.getElementById('trailCheckbox').checked;
   if (checked) {
     dp.trailOn = true;
-  }
-  else {
+  } else {
     dp.trailOn = false;
     var trail = document.getElementById('trail');
     trail.setAttributeNS(null, "points", "");
   }
 };
 
-// get textual SVG of the pendulua currently being drawn, and put it
-// in the "Get SVG" text box for the user to copy
+// Get textual SVG of the pendulua currently being drawn, and put it
+// in the "Get SVG" text box for the user to copy.
 dp.generateSVG = function() {
 
   var svgElement = document.getElementById('pendula');
   var svgText = svgElement.innerHTML;
-  // do a little cleanup
+  // Do a little cleanup.
   svgText = svgText.replace(/^\n/, "");
   svgText = svgText.replace(/\n$/, "");
   svgText = svgText.replace(/ id="[\w\-]+"/g, "");
-  // if there isn't a trail then don't include the empty trail
+  // If there isn't a trail then don't include the empty trail.
   svgText =
     svgText.replace(/ *<polyline[="\w\s\-]*points=""><\/polyline>\n/,"");
   document.getElementById('svgText').value = svgText;
@@ -393,7 +365,7 @@ dp.generateSVG = function() {
 
 dp.elementDisplayer = function(elementToDisplay) {
 
-  return function() { // switch the visibility of elementToDisplay
+  return function() { // Switch the visibility of elementToDisplay.
     var element = document.getElementById(elementToDisplay);
     var newVisibility = 'visible';
     if (element.style.visibility === 'visible') {
@@ -405,14 +377,14 @@ dp.elementDisplayer = function(elementToDisplay) {
 
 dp.browserIsSupported = function() {
 
-  // test for support of web workers and svg
+  // Test for support of web workers and svg.
   var browserIsSupported = true;
   if (!window.Worker) {
     browserIsSupported = false;
     document.getElementById('noSupport').style.display = "block";
     document.getElementById('noWorkerSupport').style.display = "block";
   }
-  //http://www.voormedia.nl/blog/2012/10/displaying-and-detecting-support-for-svg-images
+  // http://www.voormedia.nl/blog/2012/10/displaying-and-detecting-support-for-svg-images
   if (!document.implementation.hasFeature("http://www.w3.org/TR/SVG11/feature#Image", "1.1")) {
     browserIsSupported = false;
     document.getElementById('noSupport').style.display = "block";
@@ -421,7 +393,18 @@ dp.browserIsSupported = function() {
   return browserIsSupported;
 };
 
-window.onload = function() {
+dp.setControlsHelpHeight = function() {
+  var controlsHeight = document.getElementById('controls').offsetHeight;
+  var controlsHelp = document.getElementById('controlsHelp');
+  // Height is unkown until rendering, so here we are.
+  controlsHelp.style.top = (controlsHeight - 10) + "px";
+};
+
+window.addEventListener("resize", function() {
+  dp.setControlsHelpHeight();
+});
+
+window.addEventListener("load", function() {
 
   if (!dp.browserIsSupported()) {
     return;
@@ -435,10 +418,7 @@ window.onload = function() {
   dp.trailOn = trailCheckbox.checked;
   document.getElementById("genSVG").onclick = dp.generateSVG;
   document.getElementById('svgText').value = "";
-  var controlsHeight = document.getElementById('controls').offsetHeight;
-  var controlsHelp = document.getElementById('controlsHelp');
-  // heights are unkown until rendering, so here we are
-  controlsHelp.style.top = controlsHeight - 8 + "px";
+  dp.setControlsHelpHeight();
   document.getElementById('controlsHelpButton').onclick =
     dp.elementDisplayer('controlsHelp');
   document.getElementById('getSVGHelpButtonSVG').onclick =
@@ -446,13 +426,12 @@ window.onload = function() {
   var getSVGHeight = document.getElementById('getSVGHeader').offsetHeight;
   var getSVGHelpText = document.getElementById('getSVGHelpText');
   getSVGHelpText.style.top = getSVGHeight + "px";
-  
+
   dp.worker = new Worker('dpWorker.js');
-  // ideally we would be passing JSON data by reference (not copy), but
-  // word on the web is that IE10 still doesn't support even passing
-  // objects, much less by reference.  Another alternative is 
-  // encoding/parsing JSON strings, but that's slower than this and not
-  // much simpler.
+  // Ideally we would be passing JSON data by reference (not copy), but word on
+  // the web is that IE10 still doesn't support even passing objects, much less
+  // by reference.  Another alternative is encoding/parsing JSON strings, but
+  // that's slower than this and not much simpler.
   dp.worker.onmessage = (function() {
     return function(event) {
 
@@ -460,8 +439,7 @@ window.onload = function() {
       var controlChar = message.charAt(0);
       if (controlChar === "d") { // "d"ebug
         //console.log("debug: " + message);
-      }
-      else { // data
+      } else { // Data.
         var splitIndex = message.indexOf('!');
         var lastDataPoint = message.substring(0, splitIndex);
         var data = message.substring(splitIndex + 1);
@@ -470,7 +448,7 @@ window.onload = function() {
     };
   }());
   dp.loadNewDrawer();
-};
+});
 
 // http://stackoverflow.com/questions/18082/validate-numbers-in-javascript-isnumeric
 dp.isNum = function (n) {

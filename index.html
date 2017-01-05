@@ -2,8 +2,9 @@
 <html xmlns="http://www.w3.org/1999/xhtml"><head>
   <title>Double Pendulum Simulation</title>
   <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-  <link rel="stylesheet" type="text/css" href="dp.css">
-  <script type="text/javascript" src="dp.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" type="text/css" href="index.css">
+  <script type="text/javascript" src="index.js"></script>
 </head>
 
 <body>
@@ -28,27 +29,35 @@
 <div id="controls">
   <div id="controlsTitle">Initial Conditions</div>
   <div id="confInput">
-    <form id="controlsForm">
-    <label>L<sub>1</sub> <input id="l1" value="40" type="text"></label>
-    <label>L<sub>2</sub> <input id="l2" value="200" type="text"></label>
-    <label>M<sub>1</sub> <input id="m1" value="1" type="text"></label>
-    <label>M<sub>2</sub> <input id="m2" value="1" type="text"></label><br>
-    <label>θ<sub>1</sub> <input id="t1" value="179" type="text"></label>
-    <label>θ<sub>2</sub> <input id="t2" value="179" type="text"></label>
-    <label>ω<sub>1</sub> <input id="o1" value="0" type="text"></label>
-    <label>ω<sub>2</sub> <input id="o2" value="0" type="text"></label><br>
-    <input id="reload" value="Load new values" type="button">
+    <form class="conditionsInput">
+      <label>L<sub>1</sub> <input id="l1" value="40" type="text"></label>
+      <label>L<sub>2</sub> <input id="l2" value="200" type="text"></label>
+    </form>
+    <form class="conditionsInput">
+      <label>M<sub>1</sub> <input id="m1" value="1" type="text"></label>
+      <label>M<sub>2</sub> <input id="m2" value="1" type="text"></label><br>
+    </form>
+    <form class="conditionsInput">
+      <label>θ<sub>1</sub> <input id="t1" value="179" type="text"></label>
+      <label>θ<sub>2</sub> <input id="t2" value="179" type="text"></label>
+    </form>
+    <form class="conditionsInput">
+      <label>ω<sub>1</sub> <input id="o1" value="0" type="text"></label>
+      <label>ω<sub>2</sub> <input id="o2" value="0" type="text"></label><br>
+    </form>
+    <form id="conditionsSubmit">
+      <input id="reload" value="Load new values" type="button">
     </form>
   </div>
-  <svg version="1.1" baseProfile="full" xmlns="http://www.w3.org/2000/svg" width="30px" height="30px" id="configHelpButtonSVG">
+  <svg xmlns="http://www.w3.org/2000/svg" id="configHelpButtonSVG"
+       width="34px" height="34px" viewBox="-2 -2 34 34">
     <g id="controlsHelpButton">
       <rect rx="2" ry="2" width="30" height="30" stroke="#888" fill="#eee"></rect>
       <text fill="#999" stroke="#666" font-size="28" x="8" y="26">?</text>
     </g>
   </svg>
-  <div id="controlsHelp" style="top: 177px;">
-    <svg version="1.1" baseProfile="full" xmlns="http://www.w3.org/2000/svg" width="230px" height="220px">
-      <!--<rect width="300" height="300" fill="red" />-->
+  <div id="controlsHelp">
+    <svg xmlns="http://www.w3.org/2000/svg" width="230px" height="220px">
       <g transform="translate(5,5)">
         <!--L_1 vertical-->
         <line y2="50" stroke="black" stroke-width="2" stroke-dasharray="10,5"></line>
@@ -112,11 +121,10 @@
   <label>Show trail: <input id="trailCheckbox" type="checkbox"></label>
 </div>
 
-
-<!-- svg doesn't have the equivalent of innerHTML, so wrap the svg in
-  a div that does -->
+<!-- svg doesn't have the equivalent of innerHTML, so wrap the svg in a div that
+  does. -->
 <div id="pendula">
-<svg version="1.1" baseProfile="full" xmlns="http://www.w3.org/2000/svg" width="700px" height="700px">
+  <svg id="test" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 700" >
   <rect width="700" height="700" fill="white"></rect>
   <g transform="translate(350,350) scale(1 -1)">
     <polyline id="trail" stroke="black" fill="none" stroke-width="1" points=""></polyline>
@@ -124,13 +132,14 @@
     <line id="line1" stroke-width="10" stroke="#3E4BAE" y2="39.99" x2="0.7"></line>
     <line id="line2" stroke-width="10" stroke="#43AE3E" y2="239.96" x2="4.19" y1="39.99" x1="0.7"></line>
   </g>
-</svg>
+  </svg>
 </div>
 
 <form id="getSVG">
   <div id="getSVGHeader">
     <input id="genSVG" value="Generate SVG of current image" type="button">
-    <svg version="1.1" baseProfile="full" xmlns="http://www.w3.org/2000/svg" width="30px" height="30px" id="getSVGHelpButtonSVG">
+    <svg xmlns="http://www.w3.org/2000/svg" id="getSVGHelpButtonSVG"
+         width="34px" height="34px" viewBox="-2 -2 34 34">
       <g id="getSVGHelpButton">
         <rect rx="2" ry="2" width="30" height="30" stroke="#888" fill="#eee"></rect>
         <text fill="#999" stroke="#666" font-size="28" x="8" y="26">?</text>

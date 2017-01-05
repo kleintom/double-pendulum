@@ -1,28 +1,28 @@
 "use strict";
 var dp = {};
 
-dp.l1 = 100; // length of first pendulum
+// Pendula lengths and masses.
+dp.l1 = 100;
 dp.l2 = 100;
-dp.m1 = 1; // mass of first pendulum
+dp.m1 = 1;
 dp.m2 = 1;
+
 dp.dataStore = (function() {
 
-  ////// private
-  var dataString = ""; // the generated data as a string
+  // The generated data as a string, of the form x1,y1|x2,y2|...
+  var dataString = "";
   // [theta1, theta2, omega1, omega2] arrays, either initial conditions
-  // or final conditions (i.e. last data point of dataString -
-  // remember dataString doesn't store omegas)
+  // or final conditions.
   var initialPoint = [0, 0, 0, 0];
   var finalPoint = [0, 0, 0, 0];
-  ////// public
   return {
     dataString : function() { return dataString; },
     setDataString : function(s) { dataString = s; },
     setInitialConditions : function(data) {
-    initialPoint[0] = parseFloat(data[0]);
-    initialPoint[1] = parseFloat(data[1]);
-    initialPoint[2] = parseFloat(data[2]);
-    initialPoint[3] = parseFloat(data[3]);
+      initialPoint[0] = parseFloat(data[0]);
+      initialPoint[1] = parseFloat(data[1]);
+      initialPoint[2] = parseFloat(data[2]);
+      initialPoint[3] = parseFloat(data[3]);
     },
     clearData : function() {
       dataString = "";
@@ -54,7 +54,7 @@ dp.setConstants = function(data) {
 
 dp.generateData = function(steps) {
 
-  var h = 0.005; // time step
+  var h = 0.005; // Time step.
   var l1 = dp.l1;
   var l2 = dp.l2;
   var m1 = dp.m1;
@@ -63,7 +63,7 @@ dp.generateData = function(steps) {
   //var g = 9.80665;-->hard coded
   // omega1 and omega2 formulas are from
   // https://freddie.witherden.org/tools/doublependulum/
-  // I think some other sources on the web may have them wrong
+  // I think some other sources on the web may have them wrong.
   // omega1 = (d/dt)theta1
   var f3 = (function(m1, m2, M, l1, l2, sin, cos) {
     return function(y1, y2, y3, y4) {
@@ -83,14 +83,14 @@ dp.generateData = function(steps) {
     };
   }(m1, m2, M, l1, l2, Math.sin, Math.cos));
   var cur = dp.dataStore.initialData();
-  // start the data run - the final result will be a |-separated
-  // list of comma-separated x,y values
+  // Start the data run - the final result will be a |-separated
+  // list of comma-separated x,y values.
   var data = cur[0] + ',' + cur[1];
-  // we only actually report every keepStepModulus'th data point
+  // We only actually report every keepStepModulus'th data point.
   var keepStepModulus = 40;
-  // for simplicity we need to end on a step that we keep (so that cur
+  // For simplicity we need to end on a step that we keep (so that cur
   // actually comes out as the final data point at the end of the
-  // loop)
+  // loop).
   steps = steps * keepStepModulus + 1;
   var i;
   for (i = 0; i < steps; ++i) {
@@ -99,7 +99,7 @@ dp.generateData = function(steps) {
     var y2n = cur[1]; // theta2
     var y3n = cur[2]; // omega1 = dtheta1/dt
     var y4n = cur[3]; // omega2 = dtheta2/dt
-    // Compute the next iteration "y_{n+1}" using classical Runge-Kutta
+    // Compute the next iteration "y_{n+1}" using classical Runge-Kutta.
     var a1 = h * y3n;
     var a2 = h * y4n;
     var a3 = h * f3(y1n, y2n, y3n, y4n);
@@ -124,7 +124,7 @@ dp.generateData = function(steps) {
     var y2new = y2n + a2 / 6 + b2 / 3 + c2 / 3 + d2 / 6;
     var y3new = y3n + a3 / 6 + b3 / 3 + c3 / 3 + d3 / 6;
     var y4new = y4n + a4 / 6 + b4 / 3 + c4 / 3 + d4 / 6;
-    // save for the next iteration
+    // Save for the next iteration.
     cur = [y1new, y2new, y3new, y4new];
     if (i % keepStepModulus === 0) {
       data += '|' + y1new + ',' + y2new;
@@ -142,15 +142,14 @@ onmessage = function(event) {
   if (controlChar === 'c') { // 'c'onfig
     var dataArray = message.split('|');
     dp.setConstants(dataArray);
-  }
-  else if (controlChar === 's') { // 's'tart data generation
+  } else if (controlChar === 's') { // 's'tart data generation
     dp.dataStore.clearData();
     var parts = message.split('!');
     var numDatapointsRequested = parts[0];
     var initialConditions = parts[1].split('|');
     dp.dataStore.setInitialConditions(initialConditions);
     dp.generateData(numDatapointsRequested);
-    // now return the data
+    // Now return the data.
     var lastDataPoint = dp.dataStore.finalData();
     var lastDataString = lastDataPoint.join('|');
     postMessage(lastDataString + '!' + dp.dataStore.dataString());
