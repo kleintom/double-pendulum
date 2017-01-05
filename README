@@ -1,2 +1,4 @@
 An html double pendulum simulator using SVG and Web Workers.  Should work in
 IE10+ and all other modern browsers.
+
+https://kleintom.github.io/double-pendulum/
